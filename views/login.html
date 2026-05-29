@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alien Vault - Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: radial-gradient(ellipse at center, #0a0a2a, #050510);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        /* Floating orbs (alien atmosphere) */
+        body::before {
+            content: "👽";
+            position: absolute;
+            top: 10%;
+            left: 5%;
+            font-size: 4rem;
+            opacity: 0.1;
+            animation: float 20s infinite;
+        }
+        body::after {
+            content: "🛸";
+            position: absolute;
+            bottom: 10%;
+            right: 5%;
+            font-size: 4rem;
+            opacity: 0.1;
+            animation: float 15s infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+        
+        .container {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 1.5rem;
+            border: 2px solid #00ff88;
+            width: 380px;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+        }
+        
+        h1 {
+            color: #00ff88;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #0a8a4a;
+            font-size: 0.7rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            background: rgba(0, 30, 15, 0.8);
+            border: 1px solid #00ff88;
+            border-radius: 0.5rem;
+            color: #00ff88;
+            font-family: monospace;
+        }
+        
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+        
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            background: #00ff88;
+            border: none;
+            border-radius: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1rem;
+            font-family: monospace;
+            color: #0a1a0a;
+        }
+        
+        button:hover {
+            background: #00cc66;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+        
+        .error {
+            color: #ff6666;
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+        
+        .success {
+            color: #00ff88;
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+        
+        .link {
+            text-align: center;
+            margin-top: 1rem;
+            color: #0a8a4a;
+        }
+        
+        .link a {
+            color: #00ff88;
+            text-decoration: none;
+        }
+        
+        .link a:hover {
+            text-decoration: underline;
+        }
+        
+        .forgot-password {
+            text-align: center;
+            margin-top: 0.8rem;
+        }
+        
+        .forgot-password a {
+            color: #ffaa00;
+            font-size: 0.7rem;
+            text-decoration: none;
+        }
+        
+        .demo-note {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px dashed #00ff88;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            margin-top: 1rem;
+            font-size: 0.6rem;
+            color: #0a8a4a;
+            text-align: center;
+        }
+        
+        .alien-icon {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="alien-icon">👽🔐🛸</div>
+        <h1>ALIEN SECURITY CHECKPOINT</h1>
+        <div class="subtitle">Identify yourself to access the Notes Vault</div>
+        
+        <input type="email" id="email" placeholder="📡 Earthling Email" autocomplete="email">
+        <input type="password" id="password" placeholder="🔒 Galactic Password">
+        <button id="loginBtn">🚀 ACCESS VAULT</button>
+        <div id="message"></div>
+        
+        <div class="forgot-password">
+            <a href="#" id="forgotPasswordLink">🛸 Forgotten your access codes?</a>
+        </div>
+        
+        <div class="link">
+            No access codes? <a href="/signup">📡 Request Earthling Access</a>
+        </div>
+        
+        <div class="demo-note">
+            👽 DEMO MODE 👽<br>
+            For testing: email any account you created<br>
+            Forgot password? Contact the mothership (aka email yourself)
+        </div>
+    </div>
+
+    <script>
+        const loginBtn = document.getElementById('loginBtn');
+        const messageDiv = document.getElementById('message');
+        const forgotLink = document.getElementById('forgotPasswordLink');
+
+        loginBtn.addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            messageDiv.innerHTML = '';
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    messageDiv.innerHTML = '<div class="success">✅ Access granted! Redirecting to vault...</div>';
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1500);
+                } else {
+                    messageDiv.innerHTML = `<div class="error">❌ Access Denied: ${data.error}</div>`;
+                }
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="error">❌ Communication error. Is the mothership online?</div>';
+            }
+        });
+
+        forgotLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            messageDiv.innerHTML = `
+                <div class="demo-note" style="margin-top:0.5rem;">
+                    🛸 TRANSMISSION FROM MOTHERSHIP 🛸<br>
+                    This is a DEMO app. In a real app, you'd receive a password reset email.<br>
+                    For testing, remember your password or create a new account.<br>
+                    👽 The Aliens cannot recover lost codes — only YOU can.
+                </div>
+            `;
+        });
+
+        // Enter key submits
+        document.getElementById('password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') loginBtn.click();
+        });
+    </script>
+</body>
+</html>

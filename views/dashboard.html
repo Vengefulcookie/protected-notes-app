@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alien Vault - Your Notes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: radial-gradient(ellipse at center, #0a0a2a, #050510);
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Floating orbs */
+        body::before {
+            content: "👽";
+            position: fixed;
+            top: 10%;
+            left: 3%;
+            font-size: 3rem;
+            opacity: 0.1;
+            animation: float 20s infinite;
+            pointer-events: none;
+        }
+        body::after {
+            content: "🛸";
+            position: fixed;
+            bottom: 10%;
+            right: 3%;
+            font-size: 3rem;
+            opacity: 0.1;
+            animation: float 15s infinite reverse;
+            pointer-events: none;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+        
+        /* Navbar */
+        .navbar {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .logo {
+            color: #00ff88;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-shadow: 0 0 5px #00ff88;
+        }
+        
+        .logo::before {
+            content: "👽 ";
+        }
+        
+        .logo::after {
+            content: " 🛸";
+        }
+        
+        .user-info {
+            color: #0a8a4a;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #ff6666;
+            color: #ff6666;
+            padding: 0.3rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-family: monospace;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 102, 102, 0.2);
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+        }
+        
+        /* Add Note Card */
+        .add-note-card {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid #00ff88;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .add-note-card h2 {
+            color: #00ff88;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .add-note-card h2::before {
+            content: "📡 ";
+        }
+        
+        .note-title-input, .note-content-input {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
+            background: rgba(0, 30, 15, 0.8);
+            border: 1px solid #00ff88;
+            border-radius: 0.5rem;
+            color: #00ff88;
+            font-family: monospace;
+        }
+        
+        .note-content-input {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .save-btn {
+            background: #00ff88;
+            color: #0a1a0a;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: monospace;
+        }
+        
+        .save-btn:hover {
+            background: #00cc66;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+        
+        /* Notes Grid */
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1rem;
+        }
+        
+        .note-card {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            border-radius: 1rem;
+            padding: 1.2rem;
+            border-left: 4px solid #00ff88;
+            transition: transform 0.2s ease;
+        }
+        
+        .note-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+        }
+        
+        .note-title {
+            color: #00ff88;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            word-wrap: break-word;
+        }
+        
+        .note-content {
+            color: #0a8a4a;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            margin-bottom: 0.8rem;
+            word-wrap: break-word;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+        
+        .note-date {
+            color: #0a4a2a;
+            font-size: 0.6rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .note-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .edit-btn, .delete-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 0.3rem;
+        }
+        
+        .edit-btn {
+            color: #ffaa00;
+            border: 1px solid #ffaa00;
+        }
+        
+        .edit-btn:hover {
+            background: rgba(255, 170, 0, 0.2);
+        }
+        
+        .delete-btn {
+            color: #ff6666;
+            border: 1px solid #ff6666;
+        }
+        
+        .delete-btn:hover {
+            background: rgba(255, 102, 102, 0.2);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: #0a0a1a;
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid #00ff88;
+            width: 90%;
+            max-width: 500px;
+        }
+        
+        .modal-content h3 {
+            color: #00ff88;
+            margin-bottom: 1rem;
+        }
+        
+        .modal input, .modal textarea {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
+            background: rgba(0, 30, 15, 0.8);
+            border: 1px solid #00ff88;
+            border-radius: 0.5rem;
+            color: #00ff88;
+            font-family: monospace;
+        }
+        
+        .modal textarea {
+            min-height: 150px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+        
+        .save-edit-btn {
+            background: #00ff88;
+            color: #0a1a0a;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .cancel-btn {
+            background: transparent;
+            border: 1px solid #ff6666;
+            color: #ff6666;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .loading, .empty-message {
+            text-align: center;
+            color: #0a8a4a;
+            padding: 2rem;
+        }
+        
+        .empty-message::before {
+            content: "👽 ";
+        }
+        
+        .empty-message::after {
+            content: " 📡";
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #0a4a2a;
+            font-size: 0.7rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">INTERGALACTIC NOTES VAULT</div>
+        <div class="user-info">
+            <span id="username">Loading...</span>
+            <button class="logout-btn" id="logoutBtn">🚪 EXIT VAULT</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Add Note Section -->
+        <div class="add-note-card">
+            <h2>Send New Transmission</h2>
+            <input type="text" id="newNoteTitle" class="note-title-input" placeholder="📡 Transmission title...">
+            <textarea id="newNoteContent" class="note-content-input" placeholder="Write your intergalactic message here..."></textarea>
+            <button id="saveNoteBtn" class="save-btn">💾 SAVE TO VAULT</button>
+        </div>
+        
+        <!-- Notes Display -->
+        <div id="notesContainer" class="notes-grid">
+            <div class="loading">🛸 Scanning the galaxy for your notes...</div>
+        </div>
+        
+        <div class="footer">
+            🔒 Your notes are encrypted by alien technology | Protected Notes App
+        </div>
+    </div>
+    
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3>✏️ Edit Transmission</h3>
+            <input type="text" id="editNoteTitle" placeholder="Title">
+            <textarea id="editNoteContent" placeholder="Content"></textarea>
+            <div class="modal-buttons">
+                <button id="cancelEditBtn" class="cancel-btn">Cancel</button>
+                <button id="confirmEditBtn" class="save-edit-btn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentEditNoteId = null;
+        
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/me');
+                const data = await response.json();
+                
+                if (!data.authenticated) {
+                    window.location.href = '/login';
+                    return;
+                }
+                
+                document.getElementById('username').textContent = data.user.username;
+                loadNotes();
+            } catch (error) {
+                window.location.href = '/login';
+            }
+        }
+        
+        async function loadNotes() {
+            const container = document.getElementById('notesContainer');
+            container.innerHTML = '<div class="loading">🛸 Scanning the galaxy for your notes...</div>';
+            
+            try {
+                const response = await fetch('/api/notes');
+                const data = await response.json();
+                
+                if (!data.success) {
+                    container.innerHTML = '<div class="empty-message">Error loading notes from the mothership</div>';
+                    return;
+                }
+                
+                if (data.notes.length === 0) {
+                    container.innerHTML = '<div class="empty-message">📡 No transmissions received. Send your first message to the mothership above 👽</div>';
+                    return;
+                }
+                
+                container.innerHTML = '';
+                data.notes.forEach(note => {
+                    const noteCard = createNoteCard(note);
+                    container.appendChild(noteCard);
+                });
+            } catch (error) {
+                container.innerHTML = '<div class="empty-message">Communication error with the mothership</div>';
+            }
+        }
+        
+        function createNoteCard(note) {
+            const div = document.createElement('div');
+            div.className = 'note-card';
+            
+            const date = new Date(note.updated_at).toLocaleDateString();
+            
+            div.innerHTML = `
+                <div class="note-title">📡 ${escapeHtml(note.title)}</div>
+                <div class="note-content">${escapeHtml(note.content) || 'No content'}</div>
+                <div class="note-date">Last modified: ${date}</div>
+                <div class="note-actions">
+                    <button class="edit-btn" data-id="${note.id}">✏️ Edit</button>
+                    <button class="delete-btn" data-id="${note.id}">🗑️ Delete</button>
+                </div>
+            `;
+            
+            div.querySelector('.edit-btn').addEventListener('click', () => openEditModal(note));
+            div.querySelector('.delete-btn').addEventListener('click', () => deleteNote(note.id));
+            
+            return div;
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+        
+        async function createNote() {
+            const title = document.getElementById('newNoteTitle').value;
+            const content = document.getElementById('newNoteContent').value;
+            
+            if (!title.trim()) {
+                alert('Please enter a transmission title');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/notes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, content })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('newNoteTitle').value = '';
+                    document.getElementById('newNoteContent').value = '';
+                    loadNotes();
+                } else {
+                    alert(data.error || 'Failed to save transmission');
+                }
+            } catch (error) {
+                alert('Network error - mothership unreachable');
+            }
+        }
+        
+        function openEditModal(note) {
+            currentEditNoteId = note.id;
+            document.getElementById('editNoteTitle').value = note.title;
+            document.getElementById('editNoteContent').value = note.content || '';
+            document.getElementById('editModal').style.display = 'flex';
+        }
+        
+        async function updateNote() {
+            const title = document.getElementById('editNoteTitle').value;
+            const content = document.getElementById('editNoteContent').value;
+            
+            if (!title.trim()) {
+                alert('Title is required');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/notes/${currentEditNoteId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, content })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    closeModal();
+                    loadNotes();
+                } else {
+                    alert(data.error || 'Failed to update transmission');
+                }
+            } catch (error) {
+                alert('Network error');
+            }
+        }
+        
+        async function deleteNote(noteId) {
+            if (!confirm('Are you sure you want to delete this transmission? The aliens will forget it forever.')) return;
+            
+            try {
+                const response = await fetch(`/api/notes/${noteId}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    loadNotes();
+                } else {
+                    alert(data.error || 'Failed to delete transmission');
+                }
+            } catch (error) {
+                alert('Network error');
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+            currentEditNoteId = null;
+            document.getElementById('editNoteTitle').value = '';
+            document.getElementById('editNoteContent').value = '';
+        }
+        
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/';
+        }
+        
+        document.getElementById('saveNoteBtn').addEventListener('click', createNote);
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+        document.getElementById('confirmEditBtn').addEventListener('click', updateNote);
+        document.getElementById('cancelEditBtn').addEventListener('click', closeModal);
+        
+        document.getElementById('editModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('editModal')) {
+                closeModal();
+            }
+        });
+        
+        document.getElementById('newNoteTitle').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                createNote();
+            }
+        });
+        
+        checkAuth();
+    </script>
+</body>
+</html>

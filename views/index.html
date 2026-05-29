@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alien Vault - Protected Notes</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: radial-gradient(ellipse at center, #0a0a2a, #050510);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        body::before {
+            content: "👽";
+            position: absolute;
+            top: 10%;
+            left: 5%;
+            font-size: 5rem;
+            opacity: 0.1;
+            animation: float 20s infinite;
+        }
+        body::after {
+            content: "🛸";
+            position: absolute;
+            bottom: 10%;
+            right: 5%;
+            font-size: 5rem;
+            opacity: 0.1;
+            animation: float 15s infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+        
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            border: 2px solid #00ff88;
+            width: 400px;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.3);
+        }
+        
+        .alien-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        h1 {
+            color: #00ff88;
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+        
+        .subtitle {
+            color: #0a8a4a;
+            margin-bottom: 0.5rem;
+            font-size: 0.7rem;
+        }
+        
+        .tagline {
+            color: #0a4a2a;
+            margin-bottom: 2rem;
+            font-size: 0.7rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            margin: 0.5rem;
+            background: #00ff88;
+            color: #0a1a0a;
+            text-decoration: none;
+            border-radius: 2rem;
+            font-weight: bold;
+            font-family: monospace;
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover {
+            background: #00cc66;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+            transform: scale(1.02);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #00ff88;
+            color: #00ff88;
+        }
+        
+        .btn-outline:hover {
+            background: rgba(0, 255, 136, 0.1);
+        }
+        
+        .demo-note {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px dashed #00ff88;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            margin-top: 1.5rem;
+            font-size: 0.6rem;
+            color: #0a8a4a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="alien-icon">👽🔐🛸</div>
+        <h1>INTERGALACTIC NOTES VAULT</h1>
+        <div class="subtitle">Secure. Encrypted. Alien-Protected.</div>
+        <div class="tagline">Your thoughts, guarded by extraterrestrial technology</div>
+        
+        <a href="/signup" class="btn">🚀 REQUEST ACCESS</a>
+        <a href="/login" class="btn btn-outline">🔐 ENTER VAULT</a>
+        
+        <div class="demo-note">
+            👽 DEMO MODE 👽<br>
+            Create an account. Your notes are private to you.<br>
+            The aliens do not share your data with other species.
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alien Vault - Sign Up</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: radial-gradient(ellipse at center, #0a0a2a, #050510);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        /* Floating orbs */
+        body::before {
+            content: "👽";
+            position: absolute;
+            top: 10%;
+            left: 5%;
+            font-size: 4rem;
+            opacity: 0.1;
+            animation: float 20s infinite;
+        }
+        body::after {
+            content: "🛸";
+            position: absolute;
+            bottom: 10%;
+            right: 5%;
+            font-size: 4rem;
+            opacity: 0.1;
+            animation: float 15s infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+        
+        .container {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 1.5rem;
+            border: 2px solid #00ff88;
+            width: 380px;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+        }
+        
+        .alien-icon {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        h1 {
+            color: #00ff88;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #0a8a4a;
+            font-size: 0.65rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            background: rgba(0, 30, 15, 0.8);
+            border: 1px solid #00ff88;
+            border-radius: 0.5rem;
+            color: #00ff88;
+            font-family: monospace;
+        }
+        
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+        
+        input::placeholder {
+            color: #0a4a2a;
+        }
+        
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            background: #00ff88;
+            border: none;
+            border-radius: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1rem;
+            font-family: monospace;
+            color: #0a1a0a;
+        }
+        
+        button:hover {
+            background: #00cc66;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+        
+        .error {
+            color: #ff6666;
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+        
+        .success {
+            color: #00ff88;
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+        
+        .link {
+            text-align: center;
+            margin-top: 1rem;
+            color: #0a8a4a;
+        }
+        
+        .link a {
+            color: #00ff88;
+            text-decoration: none;
+        }
+        
+        .link a:hover {
+            text-decoration: underline;
+        }
+        
+        .demo-note {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px dashed #00ff88;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            margin-top: 1rem;
+            font-size: 0.6rem;
+            color: #0a8a4a;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="alien-icon">👽🔐📡</div>
+        <h1>REQUEST EARTHLING ACCESS</h1>
+        <div class="subtitle">Register for clearance to the Intergalactic Notes Vault</div>
+        
+        <input type="text" id="username" placeholder="👤 Earthling Name (username)">
+        <input type="email" id="email" placeholder="📡 Earthling Email">
+        <input type="password" id="password" placeholder="🔒 Create Galactic Password (min 4 chars)">
+        <button id="signupBtn">🚀 REQUEST ACCESS</button>
+        <div id="message"></div>
+        
+        <div class="link">
+            Already have clearance? <a href="/login">🔐 Enter the Vault</a>
+        </div>
+        
+        <div class="demo-note">
+            👽 DEMO MODE 👽<br>
+            Create any username and email. Your notes are encrypted by alien technology.
+        </div>
+    </div>
+
+    <script>
+        const signupBtn = document.getElementById('signupBtn');
+        const messageDiv = document.getElementById('message');
+
+        signupBtn.addEventListener('click', async () => {
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            messageDiv.innerHTML = '';
+
+            if (!username || !email || !password) {
+                messageDiv.innerHTML = '<div class="error">❌ All fields required for Earthling registration</div>';
+                return;
+            }
+
+            if (password.length < 4) {
+                messageDiv.innerHTML = '<div class="error">❌ Password must be at least 4 characters</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    messageDiv.innerHTML = '<div class="success">✅ Access granted! Redirecting to vault...</div>';
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1500);
+                } else {
+                    messageDiv.innerHTML = `<div class="error">❌ Access Denied: ${data.error}</div>`;
+                }
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="error">❌ Communication error. Is the mothership online?</div>';
+            }
+        });
+
+        // Enter key submits
+        document.getElementById('password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') signupBtn.click();
+        });
+    </script>
+</body>
+</html>
