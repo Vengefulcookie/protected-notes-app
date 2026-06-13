@@ -65,5 +65,3 @@ Note: The app will run at http://localhost:3000
 - LinkedIn: linkedin.com/in/snethemba-shangase-softw-mech-civil0101
 
 Built with ☕, bcrypt, and a healthy respect for user privacy
-
-text
